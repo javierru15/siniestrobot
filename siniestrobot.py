@@ -2,35 +2,38 @@ import streamlit as st
 import openai
 import pandas as pd
 
+# Ruta directa al archivo en GitHub
+archivo_url = "https://raw.githubusercontent.com/javierru15/siniestrobot/main/Info%20Siniestros.xlsx"
+
 # Cargar el archivo
-archivo = st.file_uploader("📁 Sube tu archivo Excel:", type=["xlsx"])
+df = pd.read_excel(archivo_url)
 
-# Procesar si hay archivo
-if archivo is not None:
-    df = pd.read_excel(archivo)
-    st.write("📊 Vista previa del archivo:")
-    st.dataframe(df)
+# Título
+st.title("🤖 SiniestroBot – Analiza tus datos con IA")
 
-    # Input de pregunta
-    pregunta = st.text_input("🧠 Escribe tu pregunta:")
+# Vista previa
+st.subheader("👁️ Vista previa de datos")
+st.dataframe(df)
 
-    if pregunta:
-        # Leer la API key desde los secrets
-        openai.api_key = st.secrets.get("OPENAI_API_KEY", "")
+# Pregunta del usuario
+pregunta = st.text_input("❓ Escribe tu pregunta:")
 
-        # Crear contexto a partir de las columnas
-        contexto = f"Estas son las columnas del archivo: {', '.join(df.columns)}"
-        prompt = f"{contexto}\n\nCon base en esto, responde lo siguiente:\n{pregunta}"
+if pregunta:
+    # API Key de OpenAI
+    openai.api_key = st.secrets["OPENAI_API_KEY"]
 
-        # Llamada a OpenAI
-        respuesta = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.3
-        )
+   # Contexto para el modelo
+columnas = ", ".join(df.columns)
+contexto = f"Estas son las columnas del archivo: {columnas}"
+prompt = f"{contexto}\n\nCon base en esto, responde lo siguiente:\n{pregunta}"
 
-        # Mostrar respuesta
-        st.markdown("### ✅ Respuesta:")
-        st.write(respuesta['choices'][0]['message']['content'])
-else:
-    st.warning("🔺 Sube un archivo Excel (.xlsx) para comenzar.")
+    # Llamada a OpenAI
+    respuesta = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.3
+    )
+
+    # Mostrar respuesta
+    st.markdown("### ✅ Respuesta:")
+    st.write(respuesta['choices'][0]['message']['content'])
