@@ -22,10 +22,10 @@ if pregunta:
     # API Key de OpenAI
     openai.api_key = st.secrets["OPENAI_API_KEY"]
 
-   # Contexto para el modelo
-columnas = ", ".join(df.columns)
-contexto = f"Estas son las columnas del archivo: {columnas}"
-prompt = f"{contexto}\n\nCon base en esto, responde lo siguiente:\n{pregunta}"
+    # Contexto para el modelo
+    columnas = ", ".join(df.columns)
+    contexto = f"Estas son las columnas del archivo: {columnas}"
+    prompt = f"{contexto}\n\nCon base en esto, responde lo siguiente:\n{pregunta}"
 
     # Llamada a OpenAI
     respuesta = openai.ChatCompletion.create(
