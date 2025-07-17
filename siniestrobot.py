@@ -1,6 +1,6 @@
 import streamlit as st
-import openai
 import pandas as pd
+from openai import OpenAI
 
 # Ruta directa al archivo en GitHub
 archivo_url = "https://raw.githubusercontent.com/javierru15/siniestrobot/main/Info%20Siniestros.xlsx"
@@ -19,16 +19,16 @@ st.dataframe(df)
 pregunta = st.text_input("❓ Escribe tu pregunta:")
 
 if pregunta:
-    # API Key de OpenAI
-    openai.api_key = st.secrets["OPENAI_API_KEY"]
+    # Crear cliente OpenAI
+    client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
     # Contexto para el modelo
     columnas = ", ".join(df.columns)
     contexto = f"Estas son las columnas del archivo: {columnas}"
     prompt = f"{contexto}\n\nCon base en esto, responde lo siguiente:\n{pregunta}"
 
-    # Llamada a OpenAI
-    respuesta = openai.ChatCompletion.create(
+    # Llamada a OpenAI con cliente nuevo
+    response = client.chat.completions.create(
         model="gpt-4",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.3
@@ -36,4 +36,4 @@ if pregunta:
 
     # Mostrar respuesta
     st.markdown("### ✅ Respuesta:")
-    st.write(respuesta['choices'][0]['message']['content'])
+    st.write(response.choices[0].message.content)
